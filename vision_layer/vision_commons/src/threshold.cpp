@@ -83,9 +83,10 @@ void imageCallback(const sensor_msgs::Image::ConstPtr& msg){
 					geometry_msgs::PointStamped buoy_point_message;
 					buoy_point_message.header.stamp = ros::Time();
 					buoy_point_message.header.frame_id = camera_frame.c_str();
-					buoy_point_message.point.x = (bounding_rectangle.br().x + bounding_rectangle.tl().x)/2 - (image.size().width)/2;
-					buoy_point_message.point.y = ((float)image.size().height)/2 - (bounding_rectangle.br().y + bounding_rectangle.tl().y)/2;
-					buoy_point_message.point.z = (known_width * focal_length) / (bounding_rectangle.br().x + bounding_rectangle.tl().x);
+					buoy_point_message.point.x = (known_width * focal_length) / (bounding_rectangle.br().x + bounding_rectangle.tl().x);
+					buoy_point_message.point.y = (bounding_rectangle.br().x + bounding_rectangle.tl().x)/2 - (image.size().width)/2;
+					buoy_point_message.point.z = ((float)image.size().height)/2 - (bounding_rectangle.br().y + bounding_rectangle.tl().y)/2;
+
 					ROS_INFO("Buoy Location (x, y, z) = (%.2f, %.2f, %.2f)", buoy_point_message.point.x, buoy_point_message.point.y, buoy_point_message.point.z);
 					coordinates_pub.publish(buoy_point_message);
 					cv::RotatedRect minEllipse;
@@ -123,7 +124,7 @@ int main(int argc, char **argv){
 	image_transport::ImageTransport it(nh);
 	thresholded_HSV_pub = it.advertise("/thresholded", 1);
 	marked_pub = it.advertise("/marked",1);
-	coordinates_pub = nh.advertise<geometry_msgs::PointStamped>("/buoy_processing/buoy_coordinates", 1000);
+	coordinates_pub = nh.advertise<geometry_msgs::PointStamped>("/threshold/center_coordinates", 1000);
 	image_transport::Subscriber image_raw_sub = it.subscribe("/hardware_camera/cam_lifecam/image_raw", 1, imageCallback);
 	ros::spin();
 	return 0;
